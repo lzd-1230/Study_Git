@@ -1,0 +1,5 @@
+echo "nums of var:$#"
+echo "---\$0----:$0"  
+echo "---\$1----:$1"  
+echo "all var:$*"
+echo "all var:$@"
