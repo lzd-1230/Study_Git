@@ -2,18 +2,25 @@
 import socket
 import re
 
-# 解析用户的请求
+
 def tackle_request(request_info):
+    """解析用户的请求"""
     request_lines = request_info.splitlines()
     print(">>"*20)
     print(request_lines)
     print(">>"*20)
     # GET /index.html HTTP/1.1
     if request_lines:
-        ret = re.match(r"[^/]+([^ ]*)",request_lines[0])
+        # 找到请求的文件名
+        ret = re.match(r"[^/]+([^ ]*)",request_lines[0])  # 取出请求的内容
         if ret:
             file_name = ret.group(1)
-            print("***"*20,file_name)
+            # 默认访问index页面
+            if file_name == "/":
+                file_name = "/index.html"
+            print("***"*20)
+            print(f"访问的内容是{file_name}")
+            print("***"*20)
             return file_name
     return ""
 
@@ -27,7 +34,7 @@ def server_service(client_socket,client_addr):
     file_name = tackle_request(request_info)
 
     # 发送对应的数据
-    try:
+    try:  # 打开一个文件是一件很危险的事情
         f = open("./python-3.6.12-docs-html"+file_name,"rb")
     except:
         respond_info = "HTTP/1.1 404 NOT FOUND \r\n"
@@ -39,7 +46,7 @@ def server_service(client_socket,client_addr):
     else:
         html_content = f.read()
         f.close()
-        respond_info = "HTTP/1.1 200 OK\r\n"
+        respond_info = "HTTP/1.1 200 OK\r\n"  # 返回一个标准的应答
         respond_info += "\r\n"
         # 将内容发送给浏览器
         client_socket.send(respond_info.encode("utf-8"))
@@ -53,7 +60,7 @@ def main():
     # 绑定本地ip
     tcp_server.bind(("",7890))
     # 设置为被动模式(listen)
-    tcp_server.listen(128)  # 128代表
+    tcp_server.listen(5)  # 128代表
 
     while True:
         # 等待连接(accept),这里会堵塞直到有第一个客户端连接
